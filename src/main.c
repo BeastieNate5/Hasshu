@@ -23,10 +23,10 @@ void report_log(int status, char* message) {
     printf("%s %s\n", icon, message);
 }
 
-bool check_if_file_exist(char* hash_location) {
+bool check_if_file_exist(char* file_path) {
     struct stat buffer;
     
-    if (stat(hash_location, &buffer) == 0) {
+    if (stat(file_path, &buffer) == 0) {
         return true;
     } else {
         return false;
@@ -59,6 +59,18 @@ char* allocate_hash(long size) {
     return allocatedP;
 }
 
+char* hash_string(char* string) {
+    return string;
+}
+
+bool compare_hash(char* hash, char* word) {
+    if (strcmp(hash, word) == 0) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         display_usage();
@@ -66,9 +78,17 @@ int main(int argc, char* argv[]) {
     }
 
     char* hash_location = argv[1];
-    char* wordlist_location = argv[2];
+    char* wordlist_path = argv[2];
     FILE* hash_file;
+    FILE* wordlist_file;
     bool isFile = false;
+
+    if (!check_if_file_exist(wordlist_path)) {
+        report_log(1, "Could not open wordlist");
+        exit(1);
+    } else {
+        wordlist_file = fopen(wordlist_path, "r");
+    }
     
     int hash_size;
     if (check_if_file_exist(hash_location)) {
@@ -106,11 +126,28 @@ int main(int argc, char* argv[]) {
         }
     } else {
         strcpy(hash, hash_location);
+        hash[hash_size-1] = '\0';
     }
+
+    printf("hash: %s\n", hash);
     
     printf("\x1b[92m[+]\x1b[0m Wrote hash to allocated memory\n");
+    
+    report_log(2, "Cracking password...");
 
-    printf("Hash: %s\n", hash);
+    char buffer[100];
+    bool cracked = false;
+
+    while (fgets(buffer, sizeof(buffer), wordlist_file) != NULL) {
+        if (compare_hash(hash, buffer) == true) {
+            printf("\x1b[92m[+]\x1b[0m Cracked hash: %s\n", buffer);
+            exit(0);
+        }
+    }
+
+    report_log(2, "Exhausted wordlist\n");
+
+
     free(hash);
 
 }
