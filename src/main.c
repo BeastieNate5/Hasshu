@@ -59,6 +59,14 @@ char* allocate_hash(long size) {
     return allocatedP;
 }
 
+void remove_newline(char* string, int size) {
+    for (int i = 0; i < size; i++) {
+        if (*(string+i) == '\n') {
+            *(string+i) = '\0';
+        }
+    }
+}
+
 char* hash_string(char* string) {
     return string;
 }
@@ -124,12 +132,12 @@ int main(int argc, char* argv[]) {
             printf("\x1b[91m[-]\x1b[0m Failed to read contents of hash file\n");
             exit(1);
         }
+        remove_newline(hash, hash_size);
     } else {
         strcpy(hash, hash_location);
         hash[hash_size-1] = '\0';
     }
 
-    printf("hash: %s\n", hash);
     
     printf("\x1b[92m[+]\x1b[0m Wrote hash to allocated memory\n");
     
@@ -139,6 +147,7 @@ int main(int argc, char* argv[]) {
     bool cracked = false;
 
     while (fgets(buffer, sizeof(buffer), wordlist_file) != NULL) {
+        remove_newline(buffer, 100);
         if (compare_hash(hash, buffer) == true) {
             printf("\x1b[92m[+]\x1b[0m Cracked hash: %s\n", buffer);
             exit(0);
