@@ -3,6 +3,11 @@
 #include<stdbool.h>
 #include<sys/stat.h>
 #include<string.h>
+#include<openssl/evp.h>
+#include<openssl/bio.h>
+#include<openssl/err.h>
+#include<hash.h>
+
 
 #define MAX_HASH_SIZE = 4096
 
@@ -80,6 +85,8 @@ bool compare_hash(char* hash, char* word) {
 };
 
 int main(int argc, char* argv[]) {
+    char* hased = md5("Hello");
+    printf("%s\n", hased);
     if (argc < 3) {
         display_usage();
         exit(1);
