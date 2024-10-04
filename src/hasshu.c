@@ -3,11 +3,8 @@
 #include<stdbool.h>
 #include<sys/stat.h>
 #include<string.h>
-#include<openssl/evp.h>
-#include<openssl/bio.h>
-#include<openssl/err.h>
-#include<hash.h>
-
+//#include<hash.h>
+#include"../include/hash.h"
 
 #define MAX_HASH_SIZE = 4096
 
@@ -72,10 +69,6 @@ void remove_newline(char* string, int size) {
     }
 }
 
-char* hash_string(char* string) {
-    return string;
-}
-
 bool compare_hash(char* hash, char* word) {
     if (strcmp(hash, word) == 0) {
         return true;
@@ -85,8 +78,34 @@ bool compare_hash(char* hash, char* word) {
 };
 
 int main(int argc, char* argv[]) {
-    char* hased = md5("Hello");
-    printf("%s\n", hased);
+    EVP_MD_CTX *ctx = MD_init();
+    EVP_MD *hash_algo = get_hash_algo("SHA256");  
+
+    if (!ctx_set_hash_algo(ctx, hash_algo)) {
+      exit(1);
+    }
+
+
+    if (!ctx_update_string(ctx, "Hello World")) {
+      exit(1);
+    }
+
+    char* hash_string = ctx_return_hash(ctx);
+    printf("%s\n", hash_string);
+    
+    
+    if (!ctx_update_string(ctx, "Bye World")) {
+      exit(1);
+    }
+    
+
+    char* hash_string1 = ctx_return_hash(ctx);
+    printf("%s\n", hash_string1);
+    
+    free(hash_string1);
+    free(hash_string);
+    
+
     if (argc < 3) {
         display_usage();
         exit(1);
