@@ -2,7 +2,7 @@
 #include"../include/hash.h"
 #include<string.h>
 
-EVP_MD_CTX* MD_init() {
+EVP_MD_CTX* ctx_init() {
   EVP_MD_CTX *ctx = NULL;
   ctx = EVP_MD_CTX_new();
     
@@ -53,7 +53,9 @@ char* ctx_return_hash(EVP_MD_CTX* ctx) {
     return NULL;
   }
 
-  EVP_DigestInit_ex2(ctx, NULL, NULL);
+  if (!EVP_DigestInit_ex2(ctx, NULL, NULL)) {
+    return NULL;
+  }
   
   hash_string = (char*)malloc(hash_size * 2 + 1);
   
@@ -62,7 +64,6 @@ char* ctx_return_hash(EVP_MD_CTX* ctx) {
   }
   
   free(output);
-
   // Must be freed
   return hash_string;
 

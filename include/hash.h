@@ -3,7 +3,7 @@
 #include<openssl/bio.h>
 #include<openssl/err.h>
 
-EVP_MD_CTX* MD_init();
+EVP_MD_CTX* ctx_init();
 EVP_MD* get_hash_algo(char* algo);
 int ctx_set_hash_algo(EVP_MD_CTX *ctx, EVP_MD* hash_algo);
 int ctx_update_string(EVP_MD_CTX *ctx, char* string);
