@@ -1,16 +1,25 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
 #include<stdbool.h>
 #include<sys/stat.h>
 #include<string.h>
 //#include<hash.h>
 #include"../include/hash.h"
 
-#define MAX_HASH_SIZE 100
-#define MAX_WORD_SIZE 100
+#define MAX_HASH_SIZE 200
+#define MAX_WORD_SIZE 200
 
 void display_usage() {
-    printf("Usage: hasshu <hash> <wordlist>\n");
+    printf("Usage: hasshu <hash> -m <mode> -w <wordlist>\n");
+}
+
+void display_table() {
+    printf("TABLE\n");
+}
+
+void display_help() {
+    printf("This is the help menu\n");
 }
 
 void report_log(int status, char* message) {
@@ -79,15 +88,51 @@ bool compare_hash(char* hash, char* word) {
 };
 
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
+    
+    if (argc < 2) {
         display_usage();
         exit(1);
     }
-
-    char* hash_location = argv[1];
-    char* wordlist_path = argv[2];
+    
+    char* wordlist_path = NULL;
+    int mode = -1;
+    
+    int opt = 1;
+    while ((opt = getopt(argc, argv, "htm:w:") ) != -1) {
+        switch (opt) {
+            case 'h':
+                display_usage();
+                exit(0);
+            case 't':
+                display_table();
+                exit(0);
+            case 'w':
+                wordlist_path = optarg;
+                break;
+            case 'm':
+                mode = atoi(optarg);
+                if (!mode) {
+                  display_usage();
+                  exit(1);
+                }
+                break;
+            default:
+                display_usage();
+                exit(1);
+        }
+    }
+    
+    char* hash_location = argv[argc-1];
+    
+    if (wordlist_path == NULL || mode == -1 || argc < 6) {
+      display_usage();
+      exit(1);
+    }
+    
+    
     FILE* hash_file;
     FILE* wordlist_file;
+
     bool isFile = false;
 
     if (!check_if_file_exist(wordlist_path)) {
@@ -108,12 +153,18 @@ int main(int argc, char* argv[]) {
         }
 
         hash_size = get_filesize(hash_file);
-        printf("\x1b[92m[+]\x1b[0m Located Hash file <%d bytes>\n", hash_size);
+        printf("\x1b[92m[+]\x1b[0m Located Hash file (%d bytes)\n", hash_size);
     } 
     // If we can not find a file just treat the arguement as the actual hash
     else {
        hash_size = strlen(hash_location);
-       printf("\x1b[92m[+]\x1b[0m Hash size <%d bytes>\n", hash_size);
+       printf("\x1b[92m[+]\x1b[0m Hash size (%d bytes)\n", hash_size);
+    }
+
+
+    if (hash_size > MAX_HASH_SIZE) {
+      printf("\x1b[91m[-]\x1b[0m Hash exceeded max hash size (hash > %d)\n", MAX_HASH_SIZE);
+      exit(1);
     }
 
     // For null term
@@ -121,7 +172,7 @@ int main(int argc, char* argv[]) {
     char* hash = allocate_hash(hash_size);
 
     if (hash != NULL) {
-        printf("\x1b[92m[+]\x1b[0m Successfully allocated <%d bytes>\n", hash_size);
+        printf("\x1b[92m[+]\x1b[0m Successfully allocated (%d bytes)\n", hash_size);
     } else {
         report_log(1, "Failed to allocate space for hash");
     }
@@ -153,6 +204,7 @@ int main(int argc, char* argv[]) {
 
     char buffer[MAX_WORD_SIZE];
     char* hash_buffer;
+    bool cracked = false;
 
     while (fgets(buffer, sizeof(buffer), wordlist_file) != NULL) {
         remove_newline(buffer);
@@ -170,12 +222,14 @@ int main(int argc, char* argv[]) {
         }
 
         if (compare_hash(hash, hash_buffer) == true) {
-            printf("\x1b[92m[+]\x1b[0m Cracked hash: %s\n", buffer);
-            exit(0);
+            printf("\x1b[92m[+]\x1b[0m Cracked hash: \x1b[1m%s\x1b[0m\n", buffer);
+            cracked = true;
         }
     }
-
-    report_log(2, "Exhausted wordlist\n");
+    
+    if (!cracked) { 
+      report_log(2, "Exhausted wordlist\n");
+    }
 
     EVP_MD_CTX_free(ctx);
     EVP_MD_free(hash_algo);
