@@ -3,6 +3,9 @@
 #include<string.h>
 
 EVP_MD_CTX* ctx_init() {
+  OSSL_PROVIDER *legacy = OSSL_PROVIDER_load(NULL, "legacy");
+  OSSL_PROVIDER *default_provider = OSSL_PROVIDER_load(NULL, "default");
+
   EVP_MD_CTX *ctx = NULL;
   ctx = EVP_MD_CTX_new();
     
@@ -13,12 +16,78 @@ EVP_MD_CTX* ctx_init() {
   return ctx;
 }
 
-EVP_MD* get_hash_algo(char* algo) {
+EVP_MD* get_hash_algo(int mode) {
   EVP_MD *hash_algo = NULL;
+  
+  switch (mode) {
+      case 1:
+        hash_algo = EVP_MD_fetch(NULL, "SHA1", NULL);
+        break;
+      case 2:
+        hash_algo = EVP_MD_fetch(NULL, "SHA224", NULL);
+        break;
+      case 3:
+        hash_algo = EVP_MD_fetch(NULL, "SHA256", NULL);
+        break;
+      case 4:
+        hash_algo = EVP_MD_fetch(NULL, "SHA384", NULL);
+        break;
+      case 5:
+        hash_algo = EVP_MD_fetch(NULL, "SHA512", NULL);
+        break;
+      case 6:
+        hash_algo = EVP_MD_fetch(NULL, "SHA3-224", NULL);
+        break;
+      case 7:
+        hash_algo = EVP_MD_fetch(NULL, "SHA3-256", NULL);
+        break;
+      case 8:
+        hash_algo = EVP_MD_fetch(NULL, "SHA3-384", NULL);
+        break;
+      case 9:
+        hash_algo = EVP_MD_fetch(NULL, "SHA3-512", NULL);
+        break;
+      case 10:
+        hash_algo = EVP_MD_fetch(NULL, "SHA512-224", NULL);
+        break;
+      case 11:
+        hash_algo = EVP_MD_fetch(NULL, "SHA512-256", NULL);
+        break;
+      case 12:
+        hash_algo = EVP_MD_fetch(NULL, "MD4", NULL);
+        break;
+      case 13:
+        hash_algo = EVP_MD_fetch(NULL, "MD5", NULL);
+        break;
+      case 14:
+        hash_algo = EVP_MD_fetch(NULL, "MD5-SHA1", NULL);
+        break;
+      case 15:
+        hash_algo = EVP_MD_fetch(NULL, "MDC2", NULL);
+        break;
+      case 16:
+        hash_algo = EVP_MD_fetch(NULL, "whirlpool", NULL);
+        break;
+      case 17:
+        hash_algo = EVP_MD_fetch(NULL, "SHAKE128", NULL);
+        break;
+      case 18:
+        hash_algo = EVP_MD_fetch(NULL, "SHAKE256", NULL);
+        break;
+      case 19:
+        hash_algo = EVP_MD_fetch(NULL, "SM3", NULL);
+        break;
+      case 20:
+        hash_algo = EVP_MD_fetch(NULL, "BLAKE2S-256", NULL);
+        break;
+      case 21:
+        hash_algo = EVP_MD_fetch(NULL, "BLAKE2B-512", NULL);
+        break;
+      default:
+        return NULL;
+  }
 
-  hash_algo = EVP_MD_fetch(NULL, algo, NULL);
-    
-  if (hash_algo == NULL) {
+  if (!hash_algo) {
     return NULL;
   }
 
@@ -68,3 +137,6 @@ char* ctx_return_hash(EVP_MD_CTX* ctx) {
   return hash_string;
 
 }
+
+
+

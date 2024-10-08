@@ -88,7 +88,7 @@ bool compare_hash(char* hash, char* word) {
 };
 
 int main(int argc, char* argv[]) {
-    
+
     if (argc < 2) {
         display_usage();
         exit(1);
@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
     
     report_log(2, "Setting up hashing algo");
     EVP_MD_CTX* ctx = ctx_init();
-    EVP_MD* hash_algo = get_hash_algo("SHA-256");
+    EVP_MD* hash_algo = get_hash_algo(mode);
 
     if (!ctx || !hash_algo || !ctx_set_hash_algo(ctx, hash_algo)) {
         report_log(1, "Failed to init hashing algo");
@@ -224,11 +224,15 @@ int main(int argc, char* argv[]) {
         if (compare_hash(hash, hash_buffer) == true) {
             printf("\x1b[92m[+]\x1b[0m Cracked hash: \x1b[1m%s\x1b[0m\n", buffer);
             cracked = true;
+            break;
         }
     }
     
     if (!cracked) { 
       report_log(2, "Exhausted wordlist\n");
+    }
+    else {
+      report_log(0, "Password was cracked\n");
     }
 
     EVP_MD_CTX_free(ctx);
