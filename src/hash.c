@@ -1,6 +1,6 @@
-//#include<hash.h>
 #include"../include/hash.h"
 #include<string.h>
+
 
 EVP_MD_CTX* ctx_init() {
   OSSL_PROVIDER *legacy = OSSL_PROVIDER_load(NULL, "legacy");

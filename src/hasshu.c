@@ -4,7 +4,6 @@
 #include<stdbool.h>
 #include<sys/stat.h>
 #include<string.h>
-//#include<hash.h>
 #include"../include/hash.h"
 
 #define MAX_HASH_SIZE 200
@@ -15,11 +14,21 @@ void display_usage() {
 }
 
 void display_table() {
-    printf("TABLE\n");
+    char algos[][15] = {"SHA-1", "SHA-224", "SHA-256", "SHA-384", "SHA-512", "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SHA512-224", "SHA512-256", "MD4", "MD5", "MD5-SHA1", "MDC2", "Whirlpool", "SHAKE128", "SHAKE256", "SM3", "BLAKE2S-256", "BLAKE2B-512"};
+    
+    for (int i = 1; i <= NUM_OF_ALGOS; i++) {
+      printf("%d  %s\n", i, algos[i-1]);
+    }
 }
 
 void display_help() {
-    printf("This is the help menu\n");
+    display_usage();
+
+    printf("\n");
+    printf("Options:\n\
+    -t                     Displays the available hashing modes\n\
+    -m <mode>              Sets the hashing mode\n\
+    -w <word_list_path>    Sets the wordlist that will be used\n\n");
 }
 
 void report_log(int status, char* message) {
@@ -61,16 +70,6 @@ long get_filesize(FILE* fp) {
     return size;
 }
 
-char* allocate_hash(long size) {
-    char* allocatedP = (char*)malloc(size);
-
-    if (allocatedP == NULL) {
-        return NULL;
-    }
-
-    return allocatedP;
-}
-
 void remove_newline(char* string) {
     for (int i = 0; i < strlen(string); i++) {
         if (*(string+i) == '\n') {
@@ -101,7 +100,7 @@ int main(int argc, char* argv[]) {
     while ((opt = getopt(argc, argv, "htm:w:") ) != -1) {
         switch (opt) {
             case 'h':
-                display_usage();
+                display_help();
                 exit(0);
             case 't':
                 display_table();
@@ -169,7 +168,7 @@ int main(int argc, char* argv[]) {
 
     // For null term
     hash_size += 1;
-    char* hash = allocate_hash(hash_size);
+    char* hash = (char*)malloc(hash_size);
 
     if (hash != NULL) {
         printf("\x1b[92m[+]\x1b[0m Successfully allocated (%d bytes)\n", hash_size);

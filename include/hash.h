@@ -4,6 +4,8 @@
 #include<openssl/err.h>
 #include <openssl/provider.h>
 
+#define NUM_OF_ALGOS 21
+
 EVP_MD_CTX* ctx_init();
 EVP_MD* get_hash_algo(int mode);
 int ctx_set_hash_algo(EVP_MD_CTX *ctx, EVP_MD* hash_algo);
