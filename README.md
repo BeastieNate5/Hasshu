@@ -17,7 +17,7 @@ git clone https://github.com/BeastieNate5/Hasshu
 cd Hasshu
 ```
 ```
-make
+sudo make install
 ```
 
 ## Usage
