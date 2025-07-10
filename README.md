@@ -50,7 +50,3 @@ The hash mode determines what hashing algorithm that Hasshu will use. To get all
 ```
 hasshu -t
 ```
-
-## Contribution
-I am open for contributions. If you want to contribute fork this repo and make your changes in a separate branch then submit a pull request.   
-
